@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="Ignatovich.Domain/Ignatovich.Domain.csproj" Id="96e15e79-0ff6-4ac2-9035-52c64b254652" />
   <Project Path="Ignatovich.UI/Ignatovich.UI.csproj" />
 </Solution>
