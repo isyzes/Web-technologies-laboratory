@@ -1,0 +1,61 @@
+﻿@using Ignatovich.Domain.Entities
+@model IEnumerable<Ignatovich.Domain.Entities.Book>
+
+@{
+    ViewData["Title"] = "Каталог";
+    var authors = ViewData["Authors"] as List<Author>;
+}
+
+<h1>Список книг</h1>
+
+<div class="col-2 border-2">
+    <ul class="nav ">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle"
+                   data-bs-toggle="dropdown"
+                   href="#"
+                   role="button"
+                   aria-expanded="false">
+                @ViewData["currentAuthor"]
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="dropdown-item"
+                       asp-controller="product"
+                       asp-route-author=@null>Все</a>
+                </li>
+                @foreach (var item in authors)
+                {
+                    <li>
+                        <a class="dropdown-item"
+                               asp-controller="product"
+                               asp-route-author="@item.NormalizedName">
+                            @item.FirstName  @item.LastName
+                        </a>
+                    </li>
+                }
+            </ul>
+        </li>
+    </ul>
+</div><!-- выбор категории -->
+
+<div class="card-group">
+    @foreach (var item in Model)
+    {
+        <div class="card">
+            <div class="image-container">
+                <img src="@item.Image" class="card-img-top">
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title">@item.Title<small class="text-body-secondary">✰@item.Rating</small></h5>
+                <p class="card-text">@item.Author.FirstName @item.Author.LastName</p>
+                <p></p>
+                
+                <button class="add-to-cart-btn" onclick="addToCart('@item.Id')">
+                    Добавить в корзину
+                </button>
+            </div>
+        </div>
+    }
+</div>

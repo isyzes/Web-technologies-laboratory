@@ -16,4 +16,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Ignatovich.Domain\Ignatovich.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
