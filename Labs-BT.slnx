@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="Ignatovich.API/Ignatovich.API.csproj" Id="d1c517e6-0547-417e-ad5d-e16c7278979d" />
   <Project Path="Ignatovich.Domain/Ignatovich.Domain.csproj" Id="96e15e79-0ff6-4ac2-9035-52c64b254652" />
   <Project Path="Ignatovich.UI/Ignatovich.UI.csproj" />
 </Solution>

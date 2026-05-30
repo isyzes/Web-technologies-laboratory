@@ -8,9 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using Ignatovich.Domain.Entities;
 using Ignatovich.UI.Data;
 using Ignatovich.UI.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ignatovich.UI.Areas.Admin.Pages
 {
+    [Authorize(Policy = "Admin")]
     public class IndexModel(IBookService bookService) : PageModel
     {
         public IList<Book> Book { get;set; } = default!;

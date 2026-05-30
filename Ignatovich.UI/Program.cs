@@ -1,7 +1,9 @@
 using Ignatovich.UI.Data;
 using Ignatovich.UI.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +18,22 @@ builder.Services.AddDbContext<TempContext>(options =>
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<AppUser>(options => {
+    options.SignIn.RequireConfirmedAccount = false;
+    options.Password.RequireDigit = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+})
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
+builder.Services.AddAuthorization(opt => {
+    opt.AddPolicy("admin", p =>
+    p.RequireClaim(ClaimTypes.Role, "admin"));
+});
+
+builder.Services.AddTransient<IEmailSender, NoOpEmailSender>();
+
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddTransient<IAuthorService, MemoryAuthorService>();
