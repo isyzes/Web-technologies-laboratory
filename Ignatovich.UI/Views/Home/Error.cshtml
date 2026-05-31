@@ -1,4 +1,4 @@
-﻿@model ErrorViewModel
+@model ErrorViewModel
 @{
     ViewData["Title"] = "Ошибка";
 }
@@ -9,4 +9,5 @@
         При обработке запроса произошла ошибка. Попробуйте обновить страницу или вернуться позже.
     </p>
     <a class="btn btn-primary" asp-controller="Home" asp-action="Index">На главную</a>
+    <a class="btn btn-outline-secondary ms-2" asp-controller="Product" asp-action="Index">В каталог</a>
 </div>
