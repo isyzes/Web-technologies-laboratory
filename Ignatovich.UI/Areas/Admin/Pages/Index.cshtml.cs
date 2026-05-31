@@ -1,26 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Ignatovich.Domain.Entities;
-using Ignatovich.UI.Data;
+﻿using Ignatovich.Domain.Entities;
 using Ignatovich.UI.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Ignatovich.UI.Areas.Admin.Pages
+namespace Ignatovich.UI.Areas.Admin.Pages;
+
+[Authorize(Policy = "admin")]
+public class IndexModel(IBookService bookService) : PageModel
 {
-    [Authorize(Policy = "Admin")]
-    public class IndexModel(IBookService bookService) : PageModel
-    {
-        public IList<Book> Book { get;set; } = default!;
+    public IList<Book> Book { get; set; } = [];
 
-        public async Task OnGetAsync()
-        {
-            Book = (await bookService.GetBookListAsync(null)).Data;
-                
-        }
+    public async Task OnGetAsync()
+    {
+        var result = await bookService.GetBookListAsync(null);
+        Book = result.Success && result.Data is not null ? result.Data : [];
     }
 }

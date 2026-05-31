@@ -1,78 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Ignatovich.Domain.Entities;
+using Ignatovich.UI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Ignatovich.Domain.Entities;
-using Ignatovich.UI.Data;
 
-namespace Ignatovich.UI.Areas.Admin.Pages
+namespace Ignatovich.UI.Areas.Admin.Pages;
+
+[Authorize(Policy = "admin")]
+public class EditModel(IAuthorService authorService, IBookService bookService) : PageModel
 {
-    public class EditModel : PageModel
-    {
-        private readonly Ignatovich.UI.Data.TempContext _context;
+    [BindProperty]
+    public Book Book { get; set; } = default!;
 
-        public EditModel(Ignatovich.UI.Data.TempContext context)
+    [BindProperty]
+    public IFormFile? ImageFile { get; set; }
+
+    public async Task<IActionResult> OnGetAsync(int? id)
+    {
+        if (id == null)
         {
-            _context = context;
+            return NotFound();
         }
 
-        [BindProperty]
-        public Book Book { get; set; } = default!;
-
-        public async Task<IActionResult> OnGetAsync(int? id)
+        var result = await bookService.GetBookByIdAsync(id.Value);
+        if (!result.Success || result.Data is null)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            return NotFound();
+        }
 
-            var book =  await _context.Books.FirstOrDefaultAsync(m => m.Id == id);
-            if (book == null)
-            {
-                return NotFound();
-            }
-            Book = book;
-           ViewData["AuthorId"] = new SelectList(_context.Author, "Id", "FirstName");
+        Book = result.Data;
+        await SetAuthorsAsync();
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        var imageFile = ImageFile ?? Request.Form.Files.GetFile(nameof(ImageFile));
+        ModelState.Remove($"{nameof(Book)}.{nameof(Book.Author)}");
+
+        if (!ModelState.IsValid)
+        {
+            await SetAuthorsAsync();
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync()
+        try
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
-            _context.Attach(Book).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!BookExists(Book.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return RedirectToPage("./Index");
+            await bookService.UpdateBookAsync(Book.Id, Book, imageFile);
+        }
+        catch (HttpRequestException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            await SetAuthorsAsync();
+            return Page();
         }
 
-        private bool BookExists(int id)
-        {
-            return _context.Books.Any(e => e.Id == id);
-        }
+        return RedirectToPage("./Index");
+    }
+
+    private async Task SetAuthorsAsync()
+    {
+        var authors = (await authorService.GetAuthorListAsync()).Data ?? [];
+        ViewData["AuthorId"] = new SelectList(authors, "Id", "FirstName");
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Ignatovich.Domain.Entities;
 
@@ -20,7 +21,8 @@ public class Book
     [Column(TypeName = "decimal(3,2)")]
     public decimal Rating { get; set; } // Обязательное свойство - рейтинг книги
 
-    // Навигационное свойство для связи с автором
+    // Навигационное свойство для связи с автором (не сериализуется в API)
     [ForeignKey(nameof(AuthorId))]
-    public virtual Author Author { get; set; }
+    [JsonIgnore]
+    public virtual Author? Author { get; set; }
 }

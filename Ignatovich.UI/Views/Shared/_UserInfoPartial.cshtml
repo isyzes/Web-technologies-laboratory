@@ -3,12 +3,12 @@
 	<div class="dropdown ms-auto">
 		<a class="btn btn-secondary dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 			@User.Identity.Name
-			<img src="Image/GetAvatar" width="30" alt="User" class="rounded nav-color" />
+			<img src="@Url.Action("GetAvatar", "Image")" width="30" alt="User" class="rounded nav-color" />
 		</a>
 		<ul class="dropdown-menu">
 			<li>
 				<span class="dropdown-item-text">
-					<img src="Image/GetAvatar" width="50" alt="User" class="rounded" />
+					<img src="@Url.Action("GetAvatar", "Image")" width="50" alt="User" class="rounded" />
 					@User.Identity.Name
 				</span>
 			</li>
@@ -23,7 +23,7 @@
 }
 else
 {
-	<ul class="navbar-nav">
+	<ul class="navbar-nav flex-row gap-2 ms-auto">
 		<li class="nav-item">
 			<a class="nav-link nav-collor" asp-area="Identity" asp-page="/Account/Register">Register</a>
 		</li>

@@ -1,45 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Ignatovich.Domain.Entities;
+using Ignatovich.UI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Ignatovich.Domain.Entities;
-using Ignatovich.UI.Data;
 
-namespace Ignatovich.UI.Areas.Admin.Pages
+namespace Ignatovich.UI.Areas.Admin.Pages;
+
+[Authorize(Policy = "admin")]
+public class CreateModel(IAuthorService authorService, IBookService bookService) : PageModel
 {
-    public class CreateModel : PageModel
+    [BindProperty]
+    public Book Book { get; set; } = default!;
+
+    [BindProperty]
+    public IFormFile? ImageFile { get; set; }
+
+    public async Task<IActionResult> OnGetAsync()
     {
-        private readonly Ignatovich.UI.Data.TempContext _context;
+        await SetAuthorsAsync();
+        return Page();
+    }
 
-        public CreateModel(Ignatovich.UI.Data.TempContext context)
-        {
-            _context = context;
-        }
+    public async Task<IActionResult> OnPostAsync()
+    {
+        var imageFile = ImageFile ?? Request.Form.Files.GetFile(nameof(ImageFile));
+        ModelState.Remove($"{nameof(Book)}.{nameof(Book.Author)}");
 
-        public IActionResult OnGet()
+        if (!ModelState.IsValid)
         {
-        ViewData["AuthorId"] = new SelectList(_context.Author, "Id", "FirstName");
+            await SetAuthorsAsync();
             return Page();
         }
 
-        [BindProperty]
-        public Book Book { get; set; } = default!;
-
-        // For more information, see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync()
+        var result = await bookService.CreateBookAsync(Book, imageFile);
+        if (!result.Success)
         {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
-            _context.Books.Add(Book);
-            await _context.SaveChangesAsync();
-
-            return RedirectToPage("./Index");
+            ModelState.AddModelError(string.Empty, result.ErrorMessage ?? "Error write API");
+            await SetAuthorsAsync();
+            return Page();
         }
+
+        return RedirectToPage("./Index");
+    }
+
+    private async Task SetAuthorsAsync()
+    {
+        var authors = (await authorService.GetAuthorListAsync()).Data ?? [];
+        ViewData["AuthorId"] = new SelectList(authors, "Id", "FirstName");
     }
 }

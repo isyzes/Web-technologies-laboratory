@@ -1,43 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Ignatovich.Domain.Entities;
+using Ignatovich.UI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
-using Ignatovich.Domain.Entities;
-using Ignatovich.UI.Data;
 
-namespace Ignatovich.UI.Areas.Admin.Pages
+namespace Ignatovich.UI.Areas.Admin.Pages;
+
+[Authorize(Policy = "admin")]
+public class DetailsModel(IBookService bookService) : PageModel
 {
-    public class DetailsModel : PageModel
+    public Book Book { get; set; } = default!;
+
+    public async Task<IActionResult> OnGetAsync(int? id)
     {
-        private readonly Ignatovich.UI.Data.TempContext _context;
-
-        public DetailsModel(Ignatovich.UI.Data.TempContext context)
+        if (id == null)
         {
-            _context = context;
-        }
-
-        public Book Book { get; set; } = default!;
-
-        public async Task<IActionResult> OnGetAsync(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var book = await _context.Books.FirstOrDefaultAsync(m => m.Id == id);
-
-            if (book is not null)
-            {
-                Book = book;
-
-                return Page();
-            }
-
             return NotFound();
         }
+
+        var result = await bookService.GetBookByIdAsync(id.Value);
+        if (!result.Success || result.Data is null)
+        {
+            return NotFound();
+        }
+
+        Book = result.Data;
+        return Page();
     }
 }

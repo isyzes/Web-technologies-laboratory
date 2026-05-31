@@ -1,5 +1,6 @@
 using Ignatovich.UI.Data;
 using Ignatovich.UI.Services;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
-
-builder.Services.AddDbContext<TempContext>(options =>
-    options.UseSqlServer(connectionString));
-
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -35,9 +32,21 @@ builder.Services.AddAuthorization(opt => {
 builder.Services.AddTransient<IEmailSender, NoOpEmailSender>();
 
 builder.Services.AddControllersWithViews();
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024;
+});
 
-builder.Services.AddTransient<IAuthorService, MemoryAuthorService>();
-builder.Services.AddTransient<IBookService, MemoryBookService>();
+//builder.Services.AddTransient<IAuthorService, MemoryAuthorService>();
+//builder.Services.AddTransient<IBookService, MemoryBookService>();
+
+builder.Services.AddHttpClient<IAuthorService, ApiAuthorService>(
+    otp => otp.BaseAddress = new Uri("https://localhost:7281/api/Author/")
+    );
+
+builder.Services.AddHttpClient<IBookService, ApiBooksService>(
+    otp => otp.BaseAddress = new Uri("https://localhost:7281/api/Books/")
+    );
 
 var app = builder.Build();
 
@@ -56,6 +65,7 @@ else
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
@@ -67,5 +77,7 @@ app.MapControllerRoute(
 
 app.MapRazorPages()
    .WithStaticAssets();
+
+await DbInit.SetupIdentityAdmin(app);
 
 app.Run();

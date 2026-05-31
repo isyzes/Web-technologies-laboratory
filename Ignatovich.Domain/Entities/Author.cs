@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Ignatovich.Domain.Entities;
 
@@ -15,7 +16,8 @@ public class Author
     public string LastName { get; set; }
     public string NormalizedName { get; set; }
 
-    // Навигационное свойство для связи с книгами
+    // Навигационное свойство для связи с книгами (не сериализуется в API)
+    [JsonIgnore]
     public virtual ICollection<Book> Books { get; set; }
 
     //public Author()
