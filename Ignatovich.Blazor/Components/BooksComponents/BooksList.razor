@@ -1,27 +1,42 @@
 ﻿@implements IDisposable
 @rendermode InteractiveServer
 
-<h3>BooksList</h3>
-@if (ProductService.Products !=null && ProductService.Products.Count()!=0)
-{
-	<table class="table table-striped">
-		<thead>
-			<th>Название</th>
-			<th></th>
-			@foreach(var item in ProductService.Products)
-			{
-				<tr>
-					<td>@item.Title</td>
-					<td>
-						<button class="btn btn-outline-dark" @onclick="@(() => OnBookSelected(item.Id))">
-								Подробно
-						</button>
-					</td>
-				</tr>
-			}
-		</thead>
-	</table>
-}
+<div class="books-list">
+    @if (ProductService.Products != null && ProductService.Products.Any())
+    {
+        <div class="table-responsive books-list__table-wrapper">
+            <table class="table books-list__table align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">Title</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ProductService.Products)
+                    {
+                        <tr>
+                            <td class="books-list__title">@item.Title</td>
+                            <td class="text-end">
+                                <button type="button"
+                                        class="btn btn-sm btn-primary books-list__btn"
+                                        @onclick="@(() => OnBookSelected(item.Id))">
+                                    Details
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="books-list__empty">
+            <p>No books available.</p>
+        </div>
+    }
+</div>
 
 @code {
 	[CascadingParameter]

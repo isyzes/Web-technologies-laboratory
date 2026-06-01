@@ -2,14 +2,24 @@
 @rendermode InteractiveServer
 @inject IProductService<Book> ProductService
 
-<h3>Books</h3>
+<div class="books-page">
+    <header class="books-page__header">
+        <h1 class="books-page__title">Book Catalog</h1>
+        <p class="books-page__subtitle">Browse the collection and view book details</p>
+    </header>
 
-<CascadingValue Value="ProductService">
-	<BooksList BookSelected="ShowDetails" />
-	<Pager />
-</CascadingValue>
-
-<BookDetails Book="SelectedBook"/>
+    <CascadingValue Value="ProductService">
+        <div class="books-layout">
+            <section class="books-layout__list">
+                <BooksList BookSelected="ShowDetails" />
+                <Pager />
+            </section>
+            <aside class="books-layout__details">
+                <BookDetails Book="SelectedBook" />
+            </aside>
+        </div>
+    </CascadingValue>
+</div>
 
 @code {
 	public Book SelectedBook { get; set; }

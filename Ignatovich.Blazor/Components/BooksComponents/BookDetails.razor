@@ -1,21 +1,37 @@
 ﻿@inject IAuthorService AuthorService
 
-<h3>BookDetails</h3>
-
-@if (Book != null)
-{
-	<div class="card mt-5" style="width: 18rem;">
-		<img src="@Book.Image" class="card-img-top" alt="...">
-		<div class="card-body">
-			<h5 class="card-title">@Book.Title</h5>
-			<p class="card-text">@Book.Rating</p>
-			@if (Author != null)
-			{
-				<h4 class="badge bg-info">@Author.FirstName @Author.LastName</h4>
-			}
-		</div>
-	</div>
-}
+<div class="book-details">
+    @if (Book != null)
+    {
+        <div class="book-details__card card">
+            <div class="book-details__image-wrapper">
+                <img src="@Book.Image" class="book-details__image" alt="@Book.Title cover">
+            </div>
+            <div class="card-body book-details__body">
+                <span class="book-details__label">Selected Book</span>
+                <h5 class="card-title book-details__title">@Book.Title</h5>
+                <div class="book-details__rating">
+                    <span class="book-details__rating-label">Rating</span>
+                    <span class="book-details__rating-value">@Book.Rating</span>
+                </div>
+                @if (Author != null)
+                {
+                    <div class="book-details__author">
+                        <span class="book-details__author-label">Author</span>
+                        <span class="badge book-details__author-badge">@Author.FirstName @Author.LastName</span>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="book-details__placeholder">
+            <div class="book-details__placeholder-icon" aria-hidden="true"></div>
+            <p>Select a book to view details</p>
+        </div>
+    }
+</div>
 
 @code {
 	[Parameter]

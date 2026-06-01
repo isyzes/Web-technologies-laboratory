@@ -1,27 +1,31 @@
-﻿﻿@using Ignatovich.Blazor.Services
+﻿@using Ignatovich.Blazor.Services
 @using Ignatovich.Domain.Entities
 @implements IDisposable
 @rendermode InteractiveServer
 
-<div class="btn-group my-3" role="group" aria-label="Pager">
-    <button type="button" class="btn btn-outline-primary @(PreviousEnabled ? "" : "disabled")"
-            @onclick="() => OnPageSelected(ProductService.CurrentPage - 1)">
-        &laquo;
-    </button>
+<div class="books-pager">
+    <nav aria-label="Book pagination">
+        <div class="btn-group books-pager__group" role="group">
+            <button type="button" class="btn btn-outline-primary @(PreviousEnabled ? "" : "disabled")"
+                    @onclick="() => OnPageSelected(ProductService.CurrentPage - 1)">
+                &laquo;
+            </button>
 
-    @for (int i = 1; i <= ProductService.TotalPages; i++)
-    {
-        var temp = i;
-        <button type="button" class="btn btn-outline-primary @(IsActive(temp) ? "active" : "")"
-                @onclick="() => OnPageSelected(temp)">
-            @temp
-        </button>
-    }
+            @for (int i = 1; i <= ProductService.TotalPages; i++)
+            {
+                var temp = i;
+                <button type="button" class="btn btn-outline-primary @(IsActive(temp) ? "active" : "")"
+                        @onclick="() => OnPageSelected(temp)">
+                    @temp
+                </button>
+            }
 
-    <button type="button" class="btn btn-outline-primary @(NextEnabled ? "" : "disabled")"
-            @onclick="() => OnPageSelected(ProductService.CurrentPage + 1)">
-        &raquo;
-    </button>
+            <button type="button" class="btn btn-outline-primary @(NextEnabled ? "" : "disabled")"
+                    @onclick="() => OnPageSelected(ProductService.CurrentPage + 1)">
+                &raquo;
+            </button>
+        </div>
+    </nav>
 </div>
 
 @code {
