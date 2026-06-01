@@ -1,0 +1,25 @@
+﻿@page "/books"
+@rendermode InteractiveServer
+@inject IProductService<Book> ProductService
+
+<h3>Books</h3>
+
+<CascadingValue Value="ProductService">
+	<BooksList BookSelected="ShowDetails" />
+	<Pager />
+</CascadingValue>
+
+<BookDetails Book="SelectedBook"/>
+
+@code {
+	public Book SelectedBook { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		await ProductService.GetProducts(1);
+	}
+	void ShowDetails(int id)
+	{
+		SelectedBook = ProductService.Products.First(d => d.Id == id);
+	}
+}

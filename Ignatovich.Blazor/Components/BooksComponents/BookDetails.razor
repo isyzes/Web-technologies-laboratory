@@ -1,0 +1,36 @@
+﻿@inject IAuthorService AuthorService
+
+<h3>BookDetails</h3>
+
+@if (Book != null)
+{
+	<div class="card mt-5" style="width: 18rem;">
+		<img src="@Book.Image" class="card-img-top" alt="...">
+		<div class="card-body">
+			<h5 class="card-title">@Book.Title</h5>
+			<p class="card-text">@Book.Rating</p>
+			@if (Author != null)
+			{
+				<h4 class="badge bg-info">@Author.FirstName @Author.LastName</h4>
+			}
+		</div>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public Book Book { get; set; }
+	[Parameter]
+	public EventCallback BookChanged { get; set; }
+
+	Author? Author { get; set; }
+
+	protected override async Task OnParametersSetAsync()
+	{
+		Author = null;
+		if (Book != null)
+		{
+			Author = await AuthorService.GetAuthorAsync(Book.AuthorId);
+		}
+	}
+}
